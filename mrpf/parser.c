@@ -48,3 +48,37 @@ static int is_blank_line(const char *line){
     }
     return 1;
 }
+
+int parse_input_file(const char *path, TaskSpec **tasks_out, int *n_tasks_out, int *total_time_out){
+    FILE *fp = fopen(path, "r");
+    if(fp == NULL){
+        fprintf(stderr, "Erro!! Não foi possivel abrir o arquivo de entrada '%s'.\n", path);
+        return -1;
+    }
+
+    char line[MAX_LINE_LEN];
+    int line_no = 0;
+
+    int total_time = 0;
+    int found_first_line = 0;
+    while(fgets(line, sizeof(line), fp) != NULL){
+        line_no++;
+        trim_line(line);
+        if(is_blank_line(line)){
+            continue;
+        }
+        found_first_line = 1;
+        if(!parse_positive_int(line, &total_time)){
+            fprintf(stderr, "Erro!! A linha %d do arquivo '%s' deveria conter o tempo total de simulação, mas contém '%s'.\n", line_no, path, line);
+            fclose(fp);
+            return -1;
+        }
+        break;
+    }
+
+    if(!found_first_line){
+        fprintf(stderr, "Erro!! O arquivo '%s' está vazio ou não contém tempo total.\n", path);
+        fclose(fp);
+        return -1;
+    }
+}
