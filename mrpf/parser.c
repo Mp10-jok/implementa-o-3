@@ -39,3 +39,12 @@ static void trim_line(char *line){
         memmove(line, line + start, len - start + 1);
     }
 }
+
+static int is_blank_line(const char *line){
+    for(const char *p = line; *p != '\0'; p++){
+        if(!isspace((unsigned char) *p)){
+            return 0;
+        }
+    }
+    return 1;
+}
