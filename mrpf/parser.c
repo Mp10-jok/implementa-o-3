@@ -133,5 +133,18 @@ int parse_input_file(const char *path, TaskSpec **tasks_out, int *n_tasks_out, i
             fclose(fp);
             return -1;
         }
+        if(!parse_positive_int(tokens[3], &burst)){
+            fprintf(stderr, "Erro!! A linha %d do arquivo '%s' está com BURST inválido para a tarefa '%s', ('%s' nao e um inteiro positivo).\n",line_no, path, name, tokens[3]);
+            free(tasks);
+            fclose(fp);
+            return -1;
+        }
+
+        if(burst > deadline || deadline > period){
+            fprintf(stderr, "Erro!! A linha %d do arquivo '%s' está com a tarefa '%s' violando c <= D <= P: (C = %d, D = %d, P = %d).\n", line_no, path, name, burst, deadline, period);
+            free(tasks);
+            fclose(fp);
+            return -1;
+        }
     }
 }
