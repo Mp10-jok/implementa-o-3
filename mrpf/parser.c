@@ -146,5 +146,13 @@ int parse_input_file(const char *path, TaskSpec **tasks_out, int *n_tasks_out, i
             fclose(fp);
             return -1;
         }
+
+        if(strlen(name) >= MAX_NAME_LEN){
+            fprintf(stderr, "Erro!! A linha %d do arquivo '%s' está com o nome de tarefa '%s' excedente, o tamanho maximo permitido é:(%d caracteres).\n", line_no, path, name, MAX_NAME_LEN - 1);
+            free(tasks);
+            fclose(fp);
+            return -1;
+        }
+        
     }
 }
