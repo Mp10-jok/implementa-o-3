@@ -153,6 +153,17 @@ int parse_input_file(const char *path, TaskSpec **tasks_out, int *n_tasks_out, i
             fclose(fp);
             return -1;
         }
-        
+
+        if (n_tasks == capacity){
+            capacity *= 2;
+            TaskSpec *grown = realloc(tasks, sizeof(TaskSpec) * capacity);
+            if (grown == NULL) {
+                fprintf(stderr, "Erro!! Falha de alocação de memória ao ler '%s'.\n", path);
+                free(tasks);
+                fclose(fp);
+                return -1;
+            }
+            tasks = grown;
+        }
     }
 }
