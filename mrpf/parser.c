@@ -81,4 +81,57 @@ int parse_input_file(const char *path, TaskSpec **tasks_out, int *n_tasks_out, i
         fclose(fp);
         return -1;
     }
+
+    int capacity = INITIAL_CAPACITY;
+    TaskSpec *tasks = malloc(sizeof(TaskSpec) * capacity);
+    if(tasks == NULL){
+        fprintf(stderr, "Erro!! falha de alocação de memória ao ler '%s'.\n", path);
+        fclose(fp);
+        return -1;
+    }
+
+    int n_tasks = 0;
+
+    while(fgets(line, sizeof(line), fp) != NULL){
+        line_no++;
+        trim_line(line);
+        if(is_blank_line(line)){
+            continue;
+        }
+
+        char line_copy[MAX_LINE_LEN];
+        strncpy(line_copy, line, sizeof(line_copy) - 1);
+        line_copy[sizeof(line_copy) - 1] = '\0';
+
+        char *tokens[5];
+        int n_tokens = 0;
+        char *tok = strtok(line_copy, " \t");
+        while(tok != NULL && n_tokens < 5){
+            tokens[n_tokens++] = tok;
+            tok = strtok(NULL, "\t");
+        }
+        
+        if(n_tokens != 4){
+            fprintf(stderr, "Erro!! A linha %d do arquivo '%s' está mal formada, encontrado %d campo(s): '%s'.\n");
+            free(tasks);
+            fclose(fp);
+            return -1;
+        }
+        
+        const char *name = tokens[0];
+        int period, deadline, burst;
+
+        if(!parse_positive_int(tokens[1], &period)){
+            fprintf(stderr, "Erro!! A linha %d do arquivo '%s' está com PERIODO inválido para a tarefa '%s', ('%s' não é um inteiro positivo).\n", line_no, path, name, tokens[1]);
+            free(tasks);
+            fclose(fp);
+            return -1;
+        }
+        if(!parse_positive_int(tokens[2], &deadline)){
+            fprintf(stderr, "Erro!! A linha %d do arquivo '%s' está com DEADLINE inválido para a tarefa '%s', ('%s' nao e um inteiro positivo).\n",line_no, path, name, tokens[2]);
+            free(tasks);
+            fclose(fp);
+            return -1;
+        }
+    }
 }
