@@ -165,5 +165,26 @@ int parse_input_file(const char *path, TaskSpec **tasks_out, int *n_tasks_out, i
             }
             tasks = grown;
         }
+
+        strncpy(tasks[n_tasks].name, name, MAX_NAME_LEN - 1);
+        tasks[n_tasks].name[MAX_NAME_LEN - 1] = '\0';
+        tasks[n_tasks].period = period;
+        tasks[n_tasks].deadline_rel = deadline;
+        tasks[n_tasks].burst = burst;
+        tasks[n_tasks].order_index = n_tasks;
+        n_tasks++;
     }
+
+    fclose(fp);
+
+    if(n_tasks == 0){
+        fprintf(stderr, "Erro!! O arquivo '%s' não contém nenhuma tarefa.\n", path);
+        free(tasks);
+        return -1;
+    }
+
+    *tasks_out = tasks
+    *n_tasks_out = n_tasks;
+    *total_time_out = total_time;
+    return 0;
 }
